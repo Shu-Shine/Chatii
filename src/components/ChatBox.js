@@ -15,7 +15,7 @@ export default function ChatBox(props) {
     <StyleContainer>
       <div className='title'>
         {props.activeChat.recipient && (<h3>Chatting with <span>{props.activeChat.recipient.username}</span></h3>)}
-        <Logout />
+        <Logout currentUser={props.currentUser}/>
       </div>
 
       <CurrentChat 

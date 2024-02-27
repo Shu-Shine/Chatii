@@ -1,10 +1,18 @@
 import { useNavigate } from 'react-router-dom'
 import React from 'react'
+import { hostUrl } from "../utils/Router";
+import axios from 'axios';
 
-export default function Logout() {
+export default function Logout(props) {
   const navigate = useNavigate()
 
-  const handleClick = (event) => {
+  const handleClick = async (event) => {
+    const url = `${hostUrl}/api/logout`;
+    const _id = props.currentUser._id
+    const res = await axios.post(url, {
+      _id,
+    });
+
     localStorage.setItem("chatapp-user", null)
     navigate("/login")
   }

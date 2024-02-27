@@ -8,7 +8,7 @@ export default function Welcome(props) {
   return (
     <StyleContainer>
       <div className='title'> 
-        <Logout />
+        <Logout currentUser={props.currentUser}/>
       </div>
       <img src={WelcomeLogo} alt=''/>
       <div className='words' >

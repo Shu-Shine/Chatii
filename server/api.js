@@ -5,6 +5,7 @@ const { postChat } = require("./routeHandler/postChat")
 const {getContacts} = require("./routeHandler/getContacts")
 const { getAllUsers } = require("./routeHandler/getAllUsers")
 const { postMessage } = require("./routeHandler/postMessage")
+const { postLogout } = require("./routeHandler/postLogout")
 
 const express = require("express")
 const router = express.Router()
@@ -18,6 +19,7 @@ router.post("/chat", postChat)
 router.post("/contacts", getContacts)  //? not used yet
 router.get("/allusers/:id", getAllUsers)
 router.post("/message", postMessage)
+router.post("/logout", postLogout)
 
 
 router.all("*", (req, res) => {
