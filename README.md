@@ -12,5 +12,5 @@ Login page
 ![pic](</public/project-img/Screenshot 2024-02-03 130929.jpg>)
 
 Chat page
-![pic](public/project-img/Screenshot 2024-04-17 230145.jpg)
+![pic](</public/project-img/Screenshot 2024-04-17 230145.jpg>)
 
