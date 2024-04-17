@@ -8,9 +8,9 @@ Real-time chat application built with the MERN stack and Socket.io.
 - Styled Components
 
 ## Screenshots
-login page
+Login page
 ![pic](</public/project-img/Screenshot 2024-02-03 130929.jpg>)
 
-chat page
-![pic](public/project-img/Screenshot%202024-02-03%20130701.jpg)
+Chat page
+![pic](public/project-img/Screenshot 2024-04-17 230145.jpg)
 
