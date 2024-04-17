@@ -6,7 +6,7 @@ import Logout from './Logout'
 import ChatEntry from './ChatEntry'
 
 
-
+// main interface
 export default function ChatBox(props) {
   const [content, setContent] = useState(" ")
 

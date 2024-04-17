@@ -21,6 +21,7 @@ export default function ChatEntry(props) {
         sender: props.currentUser,
       });
 
+      // API endpoint
       const urlNewMessage = `${`${hostUrl}/api/message`}`;
       const res = await axios.post(urlNewMessage, {
         recipient: props.activeChat.recipient,
