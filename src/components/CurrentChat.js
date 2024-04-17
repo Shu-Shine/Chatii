@@ -98,7 +98,7 @@ overflow-x: hidden;
 
       .sender-time{
         font-size: 0.875rem;
-        color: #4a5568;
+        color: #75ADAD;
         margin-left: auto;
       }
     }
@@ -122,7 +122,7 @@ overflow-x: hidden;
 
       .recipient-time{
         font-size: 0.875rem;
-        color: #4a5568;
+        color: #75ADAD;
         margin-right: auto;
       }
 
