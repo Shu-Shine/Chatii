@@ -1,0 +1,40 @@
+version: "2"
+services:
+  client:
+    # image: webapp-client
+    build:
+      context: .
+    restart: always
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    # volumes:  # via volume mounts to provide dependencies
+    # - .:/chat
+    # - ./node_modules:/chat/node_modules
+    # - ./src:/app/src
+    # - ./public:/app/public
+    links:
+      - api
+    networks: 
+      - webappnetwork
+  api:
+    # image: webapp-api
+    build:
+      context: ./server
+    restart: always
+    expose:
+      - 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      # - ./server:/chat/server
+      # - ./server/node_modules:/chat/server/node_modules
+      - ./server/.env:/chat/server/.env
+    # depends_on:
+    #     - mongodb
+    networks: 
+      - webappnetwork
+networks:
+  webappnetwork:
+    driver: bridge

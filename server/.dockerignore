@@ -1,0 +1,10 @@
+node_modules
+*.log
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
+.history
+.env
+.env.local
