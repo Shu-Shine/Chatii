@@ -6,15 +6,15 @@ A real-time chat application built with the MERN stack and Socket.io.
 - Socket.io
 - Bcrypt
 - Styled Components
+- Docker Compose
 
 ## Basic Features
-* __User Authentication__: Users can register and login using their email and password.
-* __Encrypted storage__: Use bcrypt for password hashing to increase user data security.
-* __Avatar Generation__: Random avatars are generated for users using the Multiavatar API.
-* __Real-time Chatting__: Chatting functionality is real-time, allowing users to send and receive messages instantly.
-* __Emoji Picker__: An emoji picker is integrated into the chat interface.
-* __Public Chat Room__: Users have access to a public chat room where they can engage in group conversations with other users.
-
+* __User Authentication__
+* __Encrypted storage__
+* __Avatar Generation__
+* __Real-time Chatting__
+* __Emoji Picker__
+* __Public Chat Room__
 
 ## Screenshots
 __Login page__  
