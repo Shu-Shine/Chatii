@@ -2,19 +2,19 @@
 A real-time chat application built with the MERN stack and Socket.io. 
 
 ## Tech Stack
-- MERN stack (MongoDB, Express.js, React.js, and Node.js)
-- Socket.io
-- Bcrypt
-- Styled Components
-- Docker Compose
+-__MERN stack (MongoDB, Express.js, React.js, and Node.js)__  
+-__Socket.io__  
+-__Bcrypt__  
+-__Styled Components__  
+-__Docker Compose__  
 
 ## Basic Features
-* __User Authentication__
-* __Encrypted storage__
-* __Avatar Generation__
-* __Real-time Chatting__
-* __Emoji Picker__
-* __Public Chat Room__
+* User Authentication
+* Encrypted storage
+* Avatar Generation
+* Real-time Chatting
+* Emoji Picker
+* Public Chat Room
 
 ## Screenshots
 __Login page__  
