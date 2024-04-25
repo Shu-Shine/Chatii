@@ -18,11 +18,18 @@ A real-time chat application built with the MERN stack and Socket.io.
 
 ## Screenshots
 __Login page__  
-![pic](</public/project-img/Screenshot 2024-02-03 130929.jpg>)
+<div align=center>
+<img width='700' src='/public/project-img/Screenshot 2024-02-03 130929.jpg'/>
+</div>
 
 __Chat window__  
-![pic](</public/project-img/Screenshot 2024-04-17 233055.jpg>)
+<div align=center>
+<img width='700' src='/public/project-img/Screenshot 2024-04-17 233055.jpg'/>
+</div>
 
 __Avatar Picker__  
-![pic](</public/project-img/Screenshot 2024-02-03 131040.jpg>)
+<div align=center>
+<img width='700' src='/public/project-img/Screenshot 2024-02-03 131040.jpg'/>
+</div>
+
 
