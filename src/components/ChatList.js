@@ -20,7 +20,8 @@ export default function ChatList(props) {
           onClick={()=>props.setActiveUser(contact)} key={i}
           >
             <div className='img-contact'>
-              <img src={`data:image/svg+xml;base64,${contact.avatarimage}`} alt=""/>
+              {/* <img src={`data:image/svg+xml;base64,${contact.avatarimage}`} alt=""/> */}
+              <img src={contact.avatarimage} alt=""/>
             </div>
 
             <div className='name-contact'>
@@ -33,8 +34,10 @@ export default function ChatList(props) {
 
       {props.currentUser && props.currentUser.avatarimage && (
         <div className='currentUser'>
-          < Link to="/profile">
-            <img src={`data:image/svg+xml;base64,${props.currentUser.avatarimage}`} alt=''/>
+          < Link to="/profile" style={{ textDecoration: 'none' }}>
+            {/* <img src={`data:image/svg+xml;base64,${props.currentUser.avatarimage}`} alt=''/> */}
+            <img src={props.currentUser.avatarimage} alt=''/>
+
           </Link>
           <h3>{props.currentUser.username}</h3>
         </div>
@@ -118,7 +121,7 @@ background-color: white;
   display: flex;
   align-items: center;
   background-color: white;
-  cursor: pointer;
+  
   border-radius: 0.3rem;
   gap: 1rem;
   padding: 1rem;
@@ -127,6 +130,7 @@ background-color: white;
   img{
     height: 3rem;
     max-inline-size: 100%;
+    cursor: pointer;
   }
 
   h3{
