@@ -1,80 +1,169 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef} from "react";
 import styled from "styled-components";
 import Picker from "emoji-picker-react";
-import axios from "axios";
-import { hostUrl } from "../utils/Router";
+// import axios from "axios";
+// import { hostUrl } from "../utils/Router";
+
 
 export default function ChatEntry(props) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [chatArrive, setChatArrive] = useState(undefined);
   const [msg, setMsg] = useState("");
+  const isMounted = useRef(true); // Ref to track component mount status
+  // Cleanup on unmount
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false; // Set to false when component unmounts
+    };
+  }, []);
 
   const handleClick = () => {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
   const handleSendMsg = async (content) => {
-    if (props.currentUser && props.activeChat.recipient) {
-      props.socket.current.emit("sendMessage", {
-        recipient: props.activeChat.recipient,
-        content: content,
-        sender: props.currentUser,
-      });
+    
+    if (!props.currentUser?._id || !props.activeChat?.users?._id || !props.socket?.current) {
+      console.error("Cannot send message: Missing user, recipient, or socket.");
+      return;
+    }
+
+    if (!content.trim()) {
+      console.log("Cannot send empty message.");
+      return;
+    }
+    // console.log("props.currentUser:", props.currentUser, );
+
+    // socket id or entire user ???
+    // props.currentUser, props.activeChat.users 都是完整 object
+
+    // socket到server, 传递全部信息 
+    const messageData = {
+      from: props.currentUser,         
+      to: props.activeChat.users, 
+      content: content.trim(),    
+    };
+
+    console.log("Emitting sendMessage with data:", messageData);
+    props.socket.current.emit("sendMessage", messageData);
+    
+      // props.socket.current.emit("sendMessage", {
+      //   users: props.activeChat.users,
+      //   content: content,
+      //   sender: props.currentUser,
+      //   createdAt: now.toISOString(),
+      // });
 
       // API endpoint
-      const urlNewMessage = `${`${hostUrl}/api/message`}`;
-      const res = await axios.post(urlNewMessage, {
-        recipient: props.activeChat.recipient,
-        content: content,
-        currentUser: props.currentUser,
-      });
+      // const urlNewMessage = `${`${hostUrl}/api/message`}`;
+      // const res = await axios.post(urlNewMessage, {
+      //   users: props.activeChat.users._id,
+      //   content: content,
+      //   currentUser: props.currentUser._id,
+      //   createdAt: now.toISOString(), 
+      // });
 
-      const newChat = {
-        // content: props.content,
-        content: msg,
-        recipient: props.activeChat.recipient,
-        sender: props.currentUser,
-      };
-      const msgs = [...props.activeChat.messages, newChat];
-      props.setActiveChat({
-        recipient: props.activeChat.recipient,
-        messages: msgs,
-      });
+      // const newChat = {
+      //   // content: props.content,
+      //   content: msg,
+      //   users: props.activeChat.users,
+      //   sender: props.currentUser,
+      //   createdAt: now.toISOString(), 
+      // };
+      // const msgs = [...props.activeChat.messages, newChat];
+      // props.setActiveChat({
+      //   users: props.activeChat.users,
+      //   messages: msgs,
+      // });
 
-      // props.setContent("");
-    }
-  };
+  //     props.setContent("");
+  }
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // if (props.content.length > 0) {
-    //   handleSendMsg(props.content);
-    // }
-    if (msg.length > 0) {
-      handleSendMsg(msg);
-      setMsg("");
-    }
+    handleSendMsg(msg);
+    setMsg("");
+    // setShowEmojiPicker(false); // Close emoji picker on send
   };
 
   useEffect(() => {
-    if (props.socket.current) {
-      props.socket.current.on("getMessage", (chat) => {
-        setChatArrive(chat);
-      });
-    }
-  }, []);
+    if (props.socket?.current) {
+      // props.socket.current.on("getMessage", (chat) => {
+      //   setChatArrive(chat);
+      // });
 
-  useEffect(() => {
-    console.log("chatArrive", chatArrive);
-    if (chatArrive) {
-      // console.log("chatArrive", chatArrive)
-      props.setActiveChat((prevChat) => ({
-        recipient: props.activeChat.recipient,
-        messages: [...prevChat.messages, chatArrive],
-      }));
+      // 接受socket消息，包含全部信息
+      const messageListener = (newMessage) => {
+        // Check if component is still mounted before updating state
+        if (!isMounted.current) {
+            console.log("Component unmounted, skipping state update for message:", newMessage);
+            return;
+        }
+
+        console.log("getMessage listener received:", newMessage);
+        if (!newMessage?._id || !newMessage?.sender?._id || !newMessage?.content) {
+          console.warn("Listener: Received incomplete message structure.");
+          return;
+        }
+
+
+        // Important: Compare IDs, not objects directly
+        if (
+          newMessage?.sender._id && 
+          props.activeChat?.users?._id && 
+          (
+            (newMessage.sender._id === props.currentUser._id && newMessage.users._id === props.activeChat.users._id) ||
+    
+            (newMessage.sender._id === props.activeChat.users._id && newMessage.users._id === props.currentUser._id) ||
+      
+            (newMessage.isBotMessage === true && newMessage.users._id === props.currentUser._id)
+          )
+        ) {
+          console.log(`Message ${newMessage._id} is relevant to active chat. Updating state.`);
+
+          props.setActiveChat((prevChat) => {
+              // Prevent adding duplicate messages if already present
+              if (prevChat.messages.some(m => m._id === newMessage._id)) {
+                  console.warn(`Duplicate message ${newMessage._id} detected. Skipping add.`);
+                  return prevChat;
+              }
+              return {
+                users: prevChat.users,
+                messages: [...prevChat.messages, newMessage], // Add the new message from socket
+              }
+          });
+          
+        } else {
+              console.log("Received message is not for the currently active chat or sender/recipient info missing.");
+        }
+      };
+      console.log("Setting up getMessage listener");
+      props.socket.current.on("getMessage", messageListener);
+
+      // Cleanup function to remove the listener
+      return () => {
+        if (props.socket?.current) {
+          console.log("Removing getMessage listener");
+          props.socket.current.off("getMessage", messageListener);
+        }
+      };
     }
-  }, [chatArrive]);
+
+  }, [props.socket, props.setActiveChat, props.activeChat?.users?._id, props.currentUser?._id]);
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log("chatArrive", chatArrive);
+  //   if (chatArrive) {
+  //     // console.log("chatArrive", chatArrive)
+  //     props.setActiveChat((prevChat) => ({
+  //       users: props.activeChat.users,
+  //       messages: [...prevChat.messages, chatArrive],
+  //     }));
+  //   }
+  // }, [chatArrive]);
 
   return (
     <StyleContainer>
@@ -89,6 +178,7 @@ export default function ChatEntry(props) {
               onEmojiClick={(emojiObject) =>
                 setMsg((prevMsg) => prevMsg + emojiObject.emoji)
               }
+              pickerStyle={{ width: '100%' }} // Example style adjustment
             />
           )}
         </div>

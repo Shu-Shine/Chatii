@@ -6,17 +6,21 @@ module.exports.postChat = async (req, res, next) => {
   try {
     let query;
     if (recipientId === "ALL_CHAT") {
-      query = { "recipient._id": recipientId };
+      query = { "users": recipientId };
     } else {
       query = {
         $or: [
-          { "recipient._id": recipientId, "sender._id": currentUserId },
-          { "recipient._id": currentUserId, "sender._id": recipientId }
+          { "users": recipientId, "sender": currentUserId },
+          { "users": currentUserId, "sender": recipientId }
         ]
       };
     }
 
-    const messages = await Message.find(query);
+    // populate the avatarimage and username 
+    const messages = await Message.find(query)
+    .populate("sender", "avatarimage username")
+    .populate("users", "avatarimage username")
+
     return res.json({ messages });
 
   } catch (error) {

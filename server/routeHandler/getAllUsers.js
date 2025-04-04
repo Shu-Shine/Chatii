@@ -13,7 +13,7 @@ module.exports.getAllUsers = async (req, res, next) => {
     return res.json(users)
 
   } catch (ex) {
-    console("error get all users ")
+    console.log("error get all users ")
     next(ex);
   }
  

@@ -5,7 +5,15 @@ import Logo from "../assets/logo.png"
 import styled from 'styled-components'
 
 export default function ChatList(props) {
+  const botUserEmail = 'chatbot@system.internal'
+  // console.log("ChatList props", props.contacts, props.active)
 
+  const sortedContacts = [...props.contacts].sort((a, b) => {
+    if (a.email === botUserEmail) return -1; // ChatBot 置顶
+    if (b.email === botUserEmail) return 1;
+    return a.username.localeCompare(b.username);
+  });
+  
   return (
     <StyleContainer>
       <div className='logo'>
@@ -13,20 +21,26 @@ export default function ChatList(props) {
         <h3>CHATII</h3>
       </div>
       
-      <div className='contacts'>
-        {props.contacts.map((contact, i) => (
-
-          <div className = {`contact ${props.active===contact? "contact-active": ""}`}
+      <div className='contacts'> 
+        {sortedContacts.map((contact, i) => (
+          <div className = {`contact ${props.active===contact._id? "contact-active": ""}`}
           onClick={()=>props.setActiveUser(contact)} key={i}
           >
+            
             <div className='img-contact'>
               {/* <img src={`data:image/svg+xml;base64,${contact.avatarimage}`} alt=""/> */}
               <img src={contact.avatarimage} alt=""/>
             </div>
 
+            {contact.email === botUserEmail &&             
+            <div className='name-contact bot'>
+              <h4>{contact.username}</h4>
+            </div>}
+            
+            {contact.email !== botUserEmail &&             
             <div className='name-contact'>
               <h4>{contact.username}</h4>
-            </div>
+            </div>}
           </div>
 
         ))}
@@ -105,11 +119,20 @@ background-color: white;
       height: 3rem;
     }
 
-    h4{
+    // h4{
+    //   color: #222;
+    //   font-family: 'Varela Round', sans-serif;
+    // }
+
+    .name-contact {
       color: #222;
       font-family: 'Varela Round', sans-serif;
-      
     }
+
+    .bot {
+      color:#007bff;
+    }
+
   }
   
   .contact-active{
@@ -130,7 +153,6 @@ background-color: white;
   img{
     height: 3rem;
     max-inline-size: 100%;
-    cursor: pointer;
   }
 
   h3{

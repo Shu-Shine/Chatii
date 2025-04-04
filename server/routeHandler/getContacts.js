@@ -5,14 +5,17 @@ module.exports.getContacts = async (req, res, next) => {
   try {
     const query = {
       $or:[
-        {"sender._id": req.user._id}, 
-        {"recipient._id": req.user._id}]
+        {"sender": req.user}, 
+        {"users": req.user}]
       }
 
     const messages = await Message.find(query)
-    const recipient_ids = messages.map( message => message.recipient._id)  
-    const sender_ids = messages.map( message => message.sender._id)  
-    const contacts = [...new Set([...recipient_ids, ...sender_ids ])].filter(id => id !== req.user._id) 
+    .populate("sender", "avatarimage ")
+    .populate("users", "avatarimage username")
+
+    const recipient_ids = messages.map( message => message.users)  // ._id
+    const sender_ids = messages.map( message => message.sender)  // ._id
+    const contacts = [...new Set([...recipient_ids, ...sender_ids ])].filter(id => id !== req.user) 
     
     return res.json({ contacts })
     

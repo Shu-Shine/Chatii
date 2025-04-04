@@ -13,9 +13,8 @@ import avatar4 from '../assets/default-avatar-4.svg';
 
 import loader from "../assets/Loading.gif"
 import {hostUrl} from "../utils/Router"
-// const api = "https://api.multiavatar.com/98734153"
 
-// 头像有问题，jpg格式和base64?
+import { convertImageUrlToDataUrl } from '../utils/ConvertImageUrl';
 
 const defaultAvatars = [
   avatar1,
@@ -101,42 +100,6 @@ function SetAvatar() {
     fileInputRef.current?.click(); // Optional chaining for safety
   };
 
-  // --- Conversion Helpers ---
-
-  // Converts an image URL (local import or external) to a Base64 Data URL
-  const convertImageUrlToDataUrl = async (imageUrl) => {
-    try {
-      const response = await fetch(imageUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const blob = await response.blob();
-
-      // Determine MIME type more reliably
-      let mimeType = blob.type;
-      // Fallback for SVGs if blob.type is empty or generic xml
-      if (!mimeType || mimeType === 'text/xml' || mimeType === 'application/xml') {
-         if (imageUrl.toLowerCase().endsWith('.svg')) {
-            mimeType = 'image/svg+xml';
-         }
-         // Add more fallbacks if needed (e.g., based on magic numbers)
-      }
-
-      // Read blob as Data URL
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result); // Result is the Data URL
-        reader.onerror = (error) => {
-          console.error("FileReader error during URL conversion:", error);
-          reject(new Error('Failed to convert image URL to Data URL.'));
-        };
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error(`Failed to fetch or convert image URL ${imageUrl}:`, error);
-      throw new Error(`Could not process image: ${error.message}`); // Re-throw for catching in handleSetAvatar
-    }
-  };
 
   // --- Set Avatar Logic ---
   const handleSetAvatar = async () => {
@@ -151,7 +114,7 @@ function SetAvatar() {
     let finalAvatarDataUrl = null;
 
     try {
-      // 1. Determine the source and get/convert to Data URL
+      // Determine the source and get/convert to Data URL
       if (customAvatarDataUrl) {
         // Custom avatar is already a data URL
         finalAvatarDataUrl = customAvatarDataUrl;
@@ -161,7 +124,7 @@ function SetAvatar() {
         if (useDefaultAvatars) {
           // Default avatar (needs conversion from URL)
           const imageUrl = defaultAvatars[selectedAvatarIndex];
-          console.log('Converting default avatar URL to data URL:', imageUrl);
+          // console.log('Converting default avatar URL to data URL:', imageUrl);
           finalAvatarDataUrl = await convertImageUrlToDataUrl(imageUrl);
           if (!finalAvatarDataUrl) throw new Error("Conversion returned empty."); // Should be caught by convertImageUrlToDataUrl itself
           console.log('Default avatar converted successfully.');
@@ -172,7 +135,7 @@ function SetAvatar() {
           if (!rawBase64) {
              throw new Error("Selected API avatar data is missing.");
           }
-          console.log('Using API avatar (raw base64 string), creating data URL.');
+          // console.log('Using API avatar (raw base64 string), creating data URL.');
           // Ensure it's SVG as expected from Multiavatar or similar APIs
           finalAvatarDataUrl = `data:image/svg+xml;base64,${rawBase64}`;
         }
@@ -183,8 +146,7 @@ function SetAvatar() {
         throw new Error("Could not determine or prepare avatar data.");
       }
 
-      // 2. Send to Backend
-      console.log('Attempting to set avatar...'); // Avoid logging the full data URL
+
       const user = JSON.parse(localStorage.getItem('chatapp-user'));
       if (!user || !user._id) {
           toast.error("User session not found. Please log in again.", toastStyle);
@@ -195,25 +157,22 @@ function SetAvatar() {
 
       const url = `${hostUrl}/api/utils/setavatar/${user._id}`; // Keep URL as is
 
-      console.log(`Sending _id: ${user._id} and avatar data to ${url}`); // Add this log for confirmation
+      // console.log(`Sending _id: ${user._id} and avatar data to ${url}`); // Add this log for confirmation
 
-      // ***** FIX: Add user._id to the request body payload *****
       const { data } = await axios.post(url, {
-        _id: user._id, // Include the user ID here
+        _id: user._id,
         avatarimage: finalAvatarDataUrl,
       });
       
 
       // 3. Handle Backend Response
       if (data?.status === true) {
-        // Update user object
-        user.isAvatarImageSet = true;
         // IMPORTANT: Use the data URL potentially returned/confirmed by the backend
         user.avatarimage = data.avatarimage || finalAvatarDataUrl; // Use backend's version if available
 
         // Update localStorage
         localStorage.setItem('chatapp-user', JSON.stringify(user));
-        console.log('Avatar set successfully. LocalStorage updated.');
+        // console.log('Avatar set successfully. LocalStorage updated.');
         toast.success('Avatar set successfully!', toastStyle);
         navigate('/'); // Navigate on success
 

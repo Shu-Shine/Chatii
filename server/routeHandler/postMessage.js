@@ -6,9 +6,10 @@ module.exports.postMessage = async (req, res, next) => {
   try {
     
     const newMessage = {
-      recipient: req.body.recipient,
+      users: req.body.users, 
       sender: req.body.currentUser,
       content:req.body.content,
+      isBotMessage: req.body.isBotMessage || false,
     }
 
     const message = await Message.create(newMessage)  
