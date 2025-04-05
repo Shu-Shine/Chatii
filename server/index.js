@@ -6,12 +6,13 @@ const socket = require("socket.io")
 // stay login at backend
 const session = require("express-session")
 const cors = require("cors")
-require("dotenv").config({ path: path.join(__dirname, '.env') })
+require("dotenv").config({ path: path.join(__dirname, '../.env') })
 
 // import services
-const auth = require("./auth");
+const auth = require("./utils/auth");
 const api = require("./api");
-const { getChatbotResponse } = require('./chatbotService');
+const { getChatbotResponse } = require('./utils/chatbotService');
+const { findOrCreateAllChat } = require('./utils/allChat');
 
 
 const mongoose = require("mongoose")
@@ -71,11 +72,11 @@ async function findOrCreateBotUser() {
             console.log('Creating Bot User...');
             botUser = new User({
                 username: botUsername,
-                email: 'chatbot@system.internal', // Use a non-real email
+                email: process.env.REACT_APP_BOT_USER_EMAIL, // Use a non-real email
                 password: Math.random().toString(36).slice(-8), // Random password, won't be used
                 avatarimage: BOT_AVATAR_DEFAULT, 
             });
-            // You might need to manually handle password hashing if your User model's pre-save hook requires it
+
             // If using bcrypt:
             const bcrypt = require('bcrypt');
             const salt = await bcrypt.genSalt(10);
@@ -272,7 +273,7 @@ io.on("connection", (socket)=>{
                 console.log(`Bot triggered by user ${from} but prompt was empty.`);
                 // Optionally send back a default help message from the bot
                  const helpText = "How can I help you? Just type '@chatbot' followed by your question.";
-                 const helpMessage = new Message({ sender: botUser._id, content: helpText,});
+                const helpMessage = new Message({ sender: botUser, content: helpText,});
                  await helpMessage.save();
                  socket.emit("getMessage", helpMessage);
             }

@@ -2,6 +2,7 @@ const Message = require("../models/message")
 
 module.exports.postChat = async (req, res, next) => {
   const {recipientId, currentUserId} = req.body
+  // console.log("req.body", req.body)
 
   try {
     let query;

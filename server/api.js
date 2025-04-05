@@ -48,10 +48,10 @@ console.log(`--- ENTERED /utils/getavatar/:seed route handler for seed: ${req.pa
 
 router.post("/register", postRegister)
 router.post("/login", postLogin)
-router.post("/utils/setavatar/:id", postAvatar)  // need placeholder
+router.post("/utils/setavatar/:id", postAvatar)  // use id as placeholder
 
 router.post("/chat", postChat)
-router.post("/contacts", getContacts)  //? not used yet
+router.post("/contacts", getContacts) 
 router.get("/allusers/:id", getAllUsers)
 router.post("/message", postMessage)
 router.post("/logout", postLogout)

@@ -30,6 +30,7 @@ async function getChatbotResponse(prompt, history = []) {
         // const response = await result.response;
         // return response.text();
 
+        console.log("History passed to startChat:", JSON.stringify(history, null, 2)); // Log the history array
         // For conversational context (better):
         const chat = model.startChat({
             generationConfig,

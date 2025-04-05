@@ -62,9 +62,6 @@ export default function ChatEntry(props) {
     }
     // console.log("props.currentUser:", props.currentUser, );
 
-    // socket id or entire user ???
-    // props.currentUser, props.activeChat.users 都是完整 object
-
     // socket到server, 传递全部信息
     const messageData = {
       from: props.currentUser,

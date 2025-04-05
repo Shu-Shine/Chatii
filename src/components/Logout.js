@@ -9,13 +9,29 @@ export default function Logout(props) {
   const handleClick = async (event) => {
     const url = `${hostUrl}/api/logout`;
     const _id = props.currentUser._id
-    const res = await axios.post(url, {
-      _id,
-    });
+ 
+    try {
+      const res = await axios.post(url, {
+        _id,
+      });
 
-    localStorage.setItem("chatapp-user", null)
-    navigate("/login")
-  }
+      // 检查状态码是否成功 (通常是 2xx)
+      if (res.status >= 200 && res.status < 300) {
+        console.log("Logout successful on server.");
+        // 只有服务器成功响应后才清理本地状态并导航
+        localStorage.removeItem(process.env.REACT_APP_LOCALHOST_KEY);
+        navigate("/login");
+      } else {
+        console.error("Logout failed on server with status:", res.status);
+        alert(`Logout failed: Server responded with status ${res.status}`);
+      }
+
+    } catch (error) {
+      console.error("Logout request failed:", error);
+      // 处理网络错误或其他请求级别的错误
+      alert("Logout request failed. Please check your connection or try again.");
+    }
+  };
 
   return (
     <div className='logout'>

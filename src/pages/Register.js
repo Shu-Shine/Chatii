@@ -45,7 +45,7 @@ function Register() {
         toast.error(data.msg, toastStyle)
       }
       if(data.status === true){
-        localStorage.setItem("chatapp-user", JSON.stringify(data.user))  // stored as strings
+        localStorage.setItem(process.env.REACT_APP_LOCALHOST_KEY, JSON.stringify(data.user))  // stored as strings
         navigate("/")
       }
     }   

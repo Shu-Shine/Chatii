@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import {Form, Link, useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
@@ -46,7 +46,7 @@ function SetAvatar() {
   // Effect to check authentication
   useEffect(() => {
     const checkUser = async () => {
-      if (!localStorage.getItem("chatapp-user")) {
+      if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
         navigate("/login");
       } else {
          // If user exists, decide whether to load API or default avatars initially
@@ -147,7 +147,7 @@ function SetAvatar() {
       }
 
 
-      const user = JSON.parse(localStorage.getItem('chatapp-user'));
+      const user = JSON.parse(localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY));
       if (!user || !user._id) {
           toast.error("User session not found. Please log in again.", toastStyle);
           navigate("/login");
@@ -171,7 +171,7 @@ function SetAvatar() {
         user.avatarimage = data.avatarimage || finalAvatarDataUrl; // Use backend's version if available
 
         // Update localStorage
-        localStorage.setItem('chatapp-user', JSON.stringify(user));
+        localStorage.setItem(process.env.REACT_APP_LOCALHOST_KEY, JSON.stringify(user));
         // console.log('Avatar set successfully. LocalStorage updated.');
         toast.success('Avatar set successfully!', toastStyle);
         navigate('/'); // Navigate on success
@@ -584,7 +584,7 @@ export default SetAvatar
 //   }
 
 //   useEffect(()=>{
-//     if(!localStorage.getItem("chatapp-user")){
+//     if(!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)){
 //       navigate("/login")  
 //     }
 //   }, [navigate]) 
@@ -594,7 +594,7 @@ export default SetAvatar
 //       toast.error("Please choose an avatar", toastStyle)
 //       return false
 //     }
-//     const user = JSON.parse(localStorage.getItem(("chatapp-user")))
+//     const user = JSON.parse(localStorage.getItem((process.env.REACT_APP_LOCALHOST_KEY)))
 //     const url = `${hostUrl}/api/setavatar/${user._id}`
 //     const { data } = await axios.post(url, {  //?
 //       _id: user._id, 
@@ -603,7 +603,7 @@ export default SetAvatar
 
 //     if(data.status === true){
 //       user.avatarimage = data.avatarimage
-//       localStorage.setItem("chatapp-user", JSON.stringify(user))
+//       localStorage.setItem(process.env.REACT_APP_LOCALHOST_KEY, JSON.stringify(user))
 
 //       navigate("/")
 //     }else{

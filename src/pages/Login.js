@@ -24,7 +24,7 @@ function Login() {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("chatapp-user")) {
+    if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/login");
     }
   }, [navigate]);
@@ -44,7 +44,7 @@ function Login() {
         toast.error(data.msg, toastStyle);
       }
       if (data.status === true) {
-        localStorage.setItem("chatapp-user", JSON.stringify(data.user)); //? what to send back
+        localStorage.setItem(process.env.REACT_APP_LOCALHOST_KEY, JSON.stringify(data.user)); 
         console.log("data.user", data.user);
         navigate("/");
       }

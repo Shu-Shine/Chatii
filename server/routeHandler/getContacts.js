@@ -1,7 +1,7 @@
 const Message = require("../models/message")
 
 module.exports.getContacts = async (req, res, next) => {
-
+  // get all the contacts of the user
   try {
     const query = {
       $or:[

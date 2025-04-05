@@ -1,11 +1,11 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react";
+import { Link } from "react-router-dom";
 
-import Logo from "../assets/logo.png"
-import styled from 'styled-components'
+import Logo from "../assets/logo.png";
+import styled from "styled-components";
 
 export default function ChatList(props) {
-  const botUserEmail = 'chatbot@system.internal'
+  const botUserEmail = process.env.REACT_APP_BOT_USER_EMAIL;
   // console.log("ChatList props", props.contacts, props.active)
 
   const sortedContacts = [...props.contacts].sort((a, b) => {
@@ -16,12 +16,12 @@ export default function ChatList(props) {
   
   return (
     <StyleContainer>
-      <div className='logo'>
+      <div className="logo">
         <img src={Logo} alt="Logo" />
         <h3>CHATII</h3>
       </div>
       
-      <div className='contacts'> 
+      <div className="contacts">
         {sortedContacts.map((contact, i) => (
           <div className = {`contact ${props.active===contact._id? "contact-active": ""}`}
           onClick={()=>props.setActiveUser(contact)} key={i}
