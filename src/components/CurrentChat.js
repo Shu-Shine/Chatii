@@ -58,7 +58,7 @@ export default function CurrentChat(props) {
   return (
     <StyleContainer>
       <div className="chat-messages-container">
-        {props.activeChat.messages.map((message) => {
+        {props.activeChat?.messages?.map((message) => {
           // activeChat.messages包含所有的消息
           // console.log("message.sender:", message.sender);
 

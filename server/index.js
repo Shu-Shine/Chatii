@@ -79,7 +79,7 @@ async function findOrCreateBotUser() {
 
             // If using bcrypt:
             const bcrypt = require('bcrypt');
-            const salt = await bcrypt.genSalt(10);
+            const salt = await bcrypt.genSalt(10);  
             botUser.password = await bcrypt.hash(botUser.password, salt);
 
             await botUser.save();
@@ -94,6 +94,14 @@ async function findOrCreateBotUser() {
     }
 }
 findOrCreateBotUser(); // Run on server start
+
+
+// All_Chat User Setup
+async function callAllChat() {
+  const allChat = await findOrCreateAllChat();
+  console.log('All Chat ID:', allChat._id);
+}
+callAllChat(); // Run on server start
 
 
 // Error handling middleware (Keep at the end), any server errors cause this function to run
@@ -272,10 +280,10 @@ io.on("connection", (socket)=>{
             } else {
                 console.log(`Bot triggered by user ${from} but prompt was empty.`);
                 // Optionally send back a default help message from the bot
-                 const helpText = "How can I help you? Just type '@chatbot' followed by your question.";
+                const helpText = "How can I help you? Just type '@chatbot' followed by your question.";
                 const helpMessage = new Message({ sender: botUser, content: helpText,});
-                 await helpMessage.save();
-                 socket.emit("getMessage", helpMessage);
+                await helpMessage.save();
+                socket.emit("getMessage", helpMessage);
             }
         }
         // --- End Chatbot Logic ---

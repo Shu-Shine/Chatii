@@ -6,7 +6,6 @@ import Picker from "emoji-picker-react";
 
 export default function ChatEntry(props) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [chatArrive, setChatArrive] = useState(undefined);
   const [msg, setMsg] = useState("");
   const emojiPickerRef = useRef(null);
   const isMounted = useRef(true); // Ref to track component mount status
@@ -166,6 +165,10 @@ export default function ChatEntry(props) {
               messages: [...prevChat.messages, newMessage], // Add the new message from socket
             };
           });
+          console.log(
+            `Updated active chat with new message ${newMessage._id}. Current activeChat: `,
+            props.activeChat
+          );
         } else {
           console.log(
             "Received message is not for the currently active chat or sender/recipient info missing."

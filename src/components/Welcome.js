@@ -2,11 +2,17 @@ import React from "react";
 import WelcomeLogo from "../assets/hi-hello.gif";
 import styled from "styled-components";
 import Logout from "./Logout";
+import SearchBar from "./SearchBar";
 
 export default function Welcome(props) {
   return (
     <StyleContainer>
       <div className="title">
+        <SearchBar
+          setIsSearching={props.setIsSearching}
+          searchTerm={props.searchTerm}
+          setSearchTerm={props.setSearchTerm}
+        />
         <Logout currentUser={props.currentUser} />
       </div>
       <img src={WelcomeLogo} alt="" />
@@ -24,22 +30,67 @@ export default function Welcome(props) {
 }
 
 const StyleContainer = styled.div`
-  display: flex;
-  padding: 2rem;
-  position: relative;
-  width: 100%;
+  display: grid;
+  grid-template-rows: 15% 85%;
   overflow: hidden;
+  background-color: white;
+  @media screen and (min-width: 720px) and (max-width: 1080px) {
+    grid-template-rows: 15% 70% 15%;
+  }
 
   .title {
-    .logout {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 20px;
+
+    form {
       position: absolute;
       right: 6%;
-      cursor: pointer;
+      // top: 40%;
+      width: 20%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      :hover::after {
-        content: " Log out";
-        color: red;
+    input {
+      // position: absolute;
+      // right: 8%;
+      // top: 5%;
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      background-color: #f0f0f0;
+      color: black;
+      font-size: 1rem;
+
+      :focus {
+        outline: none;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        background-color: white;
+        color: black;
       }
+    }
+  }
+  .logout {
+    position: absolute;
+    right: 1%;
+    top: 40%;
+    cursor: pointer;
+    padding: 0 1rem;
+
+    :hover::after {
+      content: " Log out";
+      color: white;
+      font-size: 10px;
+      background-color: white;
+      background-color: red; //rgba(27, 26, 26, 0.2);
+      border-radius: 1rem;
+      padding: 0.5rem;
     }
   }
 
@@ -50,7 +101,7 @@ const StyleContainer = styled.div`
     justify-content: center;
     position: absolute;
     bottom: 45%;
-    right: 50%;
+    right: 30%;
     color: teal;
     h1 {
       font-size: 50px;
