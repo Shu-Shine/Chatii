@@ -13,19 +13,19 @@ import ChatBox from "../components/ChatBox";
 import { hostUrl } from "../utils/Router";
 import SearchResults from "../components/SearchResults";
 
-
 export default function Chat() {
   const navigate = useNavigate();
   const socket = useRef(); // useRef to store socket instance
 
   const [currentUser, setCurrentUser] = useState(undefined); // Current user data
-  const [contacts, setContacts] = useState([]);   // List of contacts
+  const [contacts, setContacts] = useState([]); // List of contacts
   const [activeChat, setActiveChat] = useState({
     // Active chat data
     users: undefined, // recipient user data
     messages: [],
   });
   const [history, setHistory] = useState([]); // Chat history data
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const [loading, setLoading] = useState(true); // Loading state for user data
 
@@ -100,12 +100,10 @@ export default function Chat() {
       return;
     }
 
-    // // Don't fetch history for the pseudo "ALL_CHAT" contact
     // if (users.email === process.env.REACT_APP_ALL_CHAT_EMAIL) {
-    //   const ALL_CHAT = users; // ?
-    //   console.log("ALL_CHAT is:", ALL_CHAT);
+    //   const ALL_CHAT = users;
     //   console.log("Skipping history fetch for ALL_CHAT");
-    //   setActiveChat({ users: users, messages: [] }); // Ensure messages are empty
+    //   setActiveChat({ users: users, messages: [] });
     //   return;
     // }
 
@@ -153,41 +151,34 @@ export default function Chat() {
   }, [activeChat.users?._id]);
 
   // --- Fetch All Chat History ---
-  const getHistoryChat = async () => {
-    if (!currentUser?._id) {
-      // cleanup if invalid
-      setHistory([]);
-      return;
-    }
-
-    const urlHistoryChat = `${hostUrl}/api/allhistory/${currentUser._id}`;
-    console.log(`Fetching all history for currentUser`);
-
-    try {
-      const { data } = await axios.get(urlHistoryChat);
-      console.log("All history fetched:", data);
-      if (data) {
-        console.log("All history data is:", data.allMessages);
-        setHistory(data.allMessages);
-      } else {
-        console.warn("No history found in response.");
-        setHistory([]);
-      }
-    } catch (error) {
-      console.error("Error fetching all chat history:", error);
-      toast.error("Failed to load all chat history.");
-      setHistory([]); // Reset messages on error
-    }
-  };
-
   useEffect(() => {
-    if (isSearching) {
-      getHistoryChat();
-    } else {
-      // Clear messages if not searching
-      setHistory([]);
-    }
-  }, [activeChat.users?._id, isSearching]); // 
+    if (!currentUser || !isSearching) return;
+
+    const getHistoryChat = async () => {
+      setIsLoadingHistory(true); // Set loading true before fetch
+      const urlHistoryChat = `${hostUrl}/api/allhistory/${currentUser._id}`;
+      console.log(`Fetching all history for currentUser`);
+
+      try {
+        const { data } = await axios.get(urlHistoryChat);
+        console.log("All history fetched:", data);
+        if (data?.allMessages) {
+          // console.log("All history data is:", data.allMessages);
+          setHistory(data.allMessages);
+        } else {
+          console.warn("No history found in response.");
+          setHistory([]);
+        }
+      } catch (error) {
+        console.error("Error fetching all chat history:", error);
+        toast.error("Failed to load all chat history.");
+        setHistory([]); // Reset messages on error
+      } finally {
+        setIsLoadingHistory(false); // Set loading false after fetch completes or fails
+      }
+    };
+    getHistoryChat();
+  }, [currentUser, isSearching]); //
 
   // useEffect(() => {  // contacts with chat history?
   //   const urlContacts = `${hostUrl}/api/contacts`
@@ -212,8 +203,8 @@ export default function Chat() {
           const urlAllUsers = `${hostUrl}/api/allusers/${currentUser._id}`;
           console.log("Fetching contacts");
           const { data } = await axios.get(urlAllUsers);
-          setContacts([/* ALL_CHAT ,*/ ...data]); // Add ALL_CHAT conditionally if needed
-          console.log("Contacts loaded:", data);
+          setContacts([...data]);
+          // console.log("Contacts loaded:", data);
         } catch (error) {
           console.error("Error fetching contacts:", error);
           toast.error("Failed to load contacts.");
@@ -238,37 +229,44 @@ export default function Chat() {
     }
   };
 
-  // --- Function to handle selecting a search result ---??
-  const handleSelectContactResult = (contact) => {
-    setActiveUser(contact); // Reuse your existing logic to set the chat
-    setIsSearching(false); // Exit search mode
-    setSearchTerm(""); // Clear the search term
-  };
-
   const handleChatChange = useCallback((contact) => {
     console.log("Setting active chat:", contact);
-    setActiveChat({ users: contact }); // Assumes this sets the user object directly
+    // setActiveChat({ users: contact });
+    setActiveUser(contact); // Assumes this sets the user object directly
     setIsSearching(false);
     setSearchTerm("");
     // setHighlightedMessageId(null); // Reset highlight when chat changes manually
   }, []); // No dependencies needed if only using setters
 
-  // --- Modified Handler for Selecting a MESSAGE result ---
   const handleSelectMessageResult = useCallback(
-    (content, users, sender) => {
-      
-      // console.log(
-      //   `Switching to chat with ${sender.username} and highlighting message ${content._id}`
-      // );
+    // (content, users, sender) => {
+    (message) => {
+      // console.log("Selected message:", message.users.username, message.content);
+      // console.log("CurrentUser inside Chat:", currentUser);
 
-      users.username === currentUser.username? handleChatChange(sender): handleChatChange(users); 
+      if (!currentUser || !message?.users?.username) {
+        console.warn("Missing currentUser or message.users.username");
+        return;
+      }
+
+      const targetUser =
+        message.users.username === currentUser.username
+          ? message.sender
+          : message.users;
+
+      if (!targetUser) {
+        console.warn("No target user found in message:", message);
+        return;
+      }
+      // console.log(`Switching to chat with ${targetUser.username});
+      handleChatChange(targetUser);
 
       setTimeout(() => {
         // setHighlightedMessageId(message._id);
       }, 100); // Small delay, adjust if needed
     },
-    [handleChatChange]
-  ); 
+    [handleChatChange, currentUser]
+  );
 
   // Render Logic
   if (loading) {
@@ -276,7 +274,7 @@ export default function Chat() {
       <StyleContainer>
         <div>Loading user data...</div>
       </StyleContainer>
-    ); 
+    );
   }
 
   return (
@@ -295,15 +293,18 @@ export default function Chat() {
               contacts={contacts}
               history={history}
               currentUser={currentUser}
-              onContactResultClick={handleSelectContactResult}
+              onContactResultClick={handleChatChange}
               onMessageResultClick={handleSelectMessageResult}
               setIsSearching={setIsSearching}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
+              isLoadingHistory={isLoadingHistory}
             />
-          ) : !activeChat.users ? (
+          ) : !activeChat.users ? ( //  No active chat selected
             <Welcome
               currentUser={currentUser}
+              contacts={contacts}
+              setActiveUser={setActiveUser}
               setIsSearching={setIsSearching}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}

@@ -46,6 +46,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    // cookie: { secure: false } // 生产环境需要开启 secure: true (只允许通过 HTTPS 传输)
   })
 );
 

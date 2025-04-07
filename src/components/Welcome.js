@@ -3,8 +3,12 @@ import WelcomeLogo from "../assets/hi-hello.gif";
 import styled from "styled-components";
 import Logout from "./Logout";
 import SearchBar from "./SearchBar";
+import { use } from "react";
 
 export default function Welcome(props) {
+  const botUserEmail = process.env.REACT_APP_BOT_USER_EMAIL;
+  // console.log("Welcome props", props.contacts)
+  const botUser = props.contacts.find((contact) => contact.email === botUserEmail);  
   return (
     <StyleContainer>
       <div className="title">
@@ -15,7 +19,7 @@ export default function Welcome(props) {
         />
         <Logout currentUser={props.currentUser} />
       </div>
-      <img src={WelcomeLogo} alt="" />
+      <img src={WelcomeLogo} alt="" onClick={() => props.setActiveUser(botUser)} />
       <div className="words">
         {props.currentUser && (
           <h1>
@@ -120,5 +124,7 @@ const StyleContainer = styled.div`
     bottom: 15%;
     right: 15%;
     cursor: pointer;
+
   }
+
 `;
